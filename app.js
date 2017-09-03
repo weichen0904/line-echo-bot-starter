@@ -14,26 +14,36 @@ app.listen(PORT, function () {
 
 // handler receiving messages
 app.post('/', function (req, res) {
-    console.log(req.body);
-    res.send(); 
+    console.log(JSON.stringify(req.body,null,2));
+     // 記錄下來對方傳來的log,利用 JSON.stringify(__,null,2) 把對方寫的文字顯示出來
+    
+    //應聲蟲模式
+     let replyToken=req.body.events[0].replyToken;
+     let  text=req.body.events[0].message.text;
+     if (text){
+         sendMessage(replyToken,text);
+
+     }
+
+    res.send(); //回傳給line空值
 })
 
-// generic function sending messages
+// generic function sending messages 回傳內容
 function sendMessage(replyToken, text) {
     let body = {
-        replyToken,
+        replyToken:replyToken,
         messages: [{
             type: 'text',
-            text,
+            text:text,
         }],
     };
 
     let options = {
-        url: 'https://api.line.me/v2/bot/message/reply',
+        url: 'https://api.line.me/v2/bot/message/reply', //line API
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${CHANNEL_ACCESS_TOKEN}`,
+            'Authorization': `Bearer ${CHANNEL_ACCESS_TOKEN}`,//認證
         },
         body,
         json: true,
